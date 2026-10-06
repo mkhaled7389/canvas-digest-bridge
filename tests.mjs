@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {filterDeadlines,shortCourse,syncSummary} from './deadlines.js';
+const now=Date.parse('2026-10-06T15:00:00Z');
+const assignment=(id,h,submission=null)=>({id,name:`Assignment ${id}`,dueAt:new Date(now+h*3600000).toISOString(),submission});
+const snapshot={courses:[{course:{id:1,courseCode:'2026FallC-T-MAT210-61166'},assignments:[assignment(1,1),assignment(2,60),assignment(3,-1),assignment(4,2,{workflowState:'graded'}),assignment(5,3,{workflowState:'graded',submittedAt:'2026-10-05T10:00Z'})]},{course:{id:2,name:'WPC 101'},assignments:[assignment(6,10),assignment(7,300)]}]};
+const ids=(filter,selectedCourseIds=null)=>filterDeadlines(snapshot,{filter,selectedCourseIds,now}).map(a=>a.id);
+assert.deepEqual(ids('48h'),[1,4,6]);assert.deepEqual(ids('7d'),[1,4,6,2]);assert.deepEqual(ids('overdue'),[3]);assert.deepEqual(ids('completed'),[5]);assert.deepEqual(ids('upcoming',[]),[]);assert.deepEqual(ids('48h',['2']),[6]);
+assert.equal(shortCourse({courseCode:'2026FallC-T-MAT210-61166'}),'MAT 210');
+assert.equal(syncSummary({monitoringEnabled:false,canvasStatus:{state:'signed_in'}},now).state,'disabled');
+assert.equal(syncSummary({monitoringEnabled:true,canvasSnapshot:{fetchedAt:new Date(now-31*60000).toISOString(),coverage:'partial'}},now).freshness,'Saved snapshot may be stale');
+assert.equal(syncSummary({monitoringEnabled:true,canvasSnapshot:{coverage:'partial'}},now).coverage,'Partial course coverage');
+console.log('PASS: course selection, time windows, overdue, completion evidence, disabled/stale/partial status');

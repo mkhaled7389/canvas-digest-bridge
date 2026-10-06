@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "Canvas Digest Bridge",
+  "version": "0.3.0",
+  "description": "Read-only ASU Canvas session checks, upcoming deadlines, and local JSON exports. Optional Pushover sign-out alerts.",
+  "permissions": [
+    "alarms",
+    "downloads",
+    "notifications",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://canvas.asu.edu/*"
+  ],
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://canvas.asu.edu/*"
+      ],
+      "js": [
+        "canvas-session.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Canvas Digest Bridge",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "optional_host_permissions": [
+    "https://api.pushover.net/*"
+  ],
+  "icons": {
+    "128": "icon-128.png"
+  }
+}

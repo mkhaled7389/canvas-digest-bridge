@@ -1,1 +1,9 @@
-{"name":"canvas-digest-bridge","version":"0.3.0","private":true,"type":"module","scripts":{"test":"node tests.mjs"}}
+{
+  "name": "canvas-digest-bridge",
+  "version": "0.4.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests.mjs"
+  }
+}

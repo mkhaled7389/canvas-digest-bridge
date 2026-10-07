@@ -1,3 +1,5 @@
+import {withProgress} from './interactions.js';
+import './theme.js';
 import { shortCourse, filterDeadlines, syncSummary } from './deadlines.js';
 const $ = id => document.getElementById(id);
 let snapshot = {}, preferences = {selectedCourseIds:null,filter:'upcoming'}, busy = false;
@@ -17,10 +19,23 @@ function renderItems() {
   }) : [Object.assign(document.createElement('li'),{className:'empty',textContent:'No matching items in the saved snapshot. Missing items do not prove completion or cancellation.'})]));
 }
 async function render() {
-  const data=await chrome.storage.local.get(['canvasStatus','canvasSnapshot','canvasRefreshStatus','monitoringEnabled','viewPreferences']);
+  const data=await chrome.storage.local.get(['canvasStatus','canvasSnapshot','canvasRefreshStatus','monitoringEnabled','viewPreferences','calendarConnected','calendarSyncStatus']);
   snapshot=data.canvasSnapshot||{};preferences={selectedCourseIds:null,filter:'upcoming',...data.viewPreferences};
-  const summary=syncSummary(data);$('statusCard').dataset.state=summary.state;$('state').textContent=summary.state.replace('_',' ');
-  $('detail').textContent=[!data.monitoringEnabled?'Monitoring is off. Enable it in Settings; saved data is retained.':data.canvasStatus?.detail,summary.freshness,summary.coverage,summary.error&&`Refresh failed: ${summary.error}; saved data retained`,snapshot.fetchedAt&&`Snapshot: ${displayDate(snapshot.fetchedAt)} (Arizona)`,data.canvasStatus?.checkedAt&&`Session checked: ${displayDate(data.canvasStatus.checkedAt)}`].filter(Boolean).join(' · ');
+  const summary=syncSummary(data);$('statusCard').dataset.state=summary.state;
+  const current=data.monitoringEnabled&&summary.state==='signed_in';
+  const fresh=Number.isFinite(Date.parse(snapshot.fetchedAt))&&Date.now()-Date.parse(snapshot.fetchedAt)<=30*60000;
+  const complete=snapshot.coverage&&snapshot.coverage!=='partial';
+  const sync=data.calendarSyncStatus;
+  const syncFresh=sync?.ok&&Number.isFinite(Date.parse(sync.checkedAt))&&Date.now()-Date.parse(sync.checkedAt)<=30*60000;
+  $('state').textContent=!data.monitoringEnabled?'Monitoring paused':current&&fresh&&!summary.error?'Canvas ready':current?'Refresh needed':summary.state==='signed_out'?'Sign in to Canvas':'Check connection';
+  $('identity').textContent=data.canvasStatus?.detail?.match(/Connected as ([^.]+)/)?.[1]||'';
+  const rows=[
+    ['Canvas',current?'Signed in':summary.state==='signed_out'?'Signed out':data.monitoringEnabled?'Not verified':'Paused',current?'good':'warn'],
+    ['Assignments',fresh?(complete?'Up to date':'Partial data'):snapshot.fetchedAt?'Refresh needed':'Not refreshed',fresh&&complete&&!summary.error?'good':'warn'],
+    ['Google Calendar',!data.calendarConnected?'Not connected':sync?.error?'Needs attention':syncFresh?'Synced':sync?.ok?'Last sync saved':'Connected · not synced',data.calendarConnected&&syncFresh&&!sync?.error?'good':'neutral']
+  ];
+  $('connections').replaceChildren(...rows.map(([label,value,state])=>{const row=document.createElement('div');row.className='connection';row.dataset.state=state;const name=document.createElement('span');name.textContent=label;const badge=document.createElement('strong');badge.textContent=value;row.append(name,badge);return row;}));
+  $('detail').textContent=summary.error?'Refresh failed. Saved data retained.':fresh?`Updated ${new Intl.DateTimeFormat(undefined,{hour:'numeric',minute:'2-digit',timeZone:'America/Phoenix'}).format(new Date(snapshot.fetchedAt))} · Arizona time`:'Refresh to check exact deadlines.';
   $('deadlineFilter').value=preferences.filter;
   const legend=document.createElement('legend');legend.textContent='Included courses';
   $('courseFilters').replaceChildren(legend,...(snapshot.courses||[]).map(({course,error})=>{
@@ -38,3 +53,5 @@ $('check').onclick=()=>run('CHECK_NOW');$('snapshot').onclick=()=>run('REFRESH_S
 $('export').onclick=async()=>{try{const r=await chrome.runtime.sendMessage({type:'EXPORT_SNAPSHOT'});$('detail').textContent=r.ok?'Full snapshot download started. It contains private coursework data.':r.error;}catch{$('detail').textContent='Could not start export.';}};
 $('open').onclick=()=>chrome.tabs.create({url:'https://canvas.asu.edu/'});$('settings').onclick=()=>chrome.runtime.openOptionsPage();
 chrome.storage.onChanged.addListener(()=>void render());void render();
+
+for(const [id,label] of Object.entries({"check": "Checking…", "snapshot": "Refreshing…", "export": "Exporting…", "allCourses": "Selecting…"})){const button=document.getElementById(id),action=button.onclick;button.onclick=()=>withProgress(button,label,()=>action());}

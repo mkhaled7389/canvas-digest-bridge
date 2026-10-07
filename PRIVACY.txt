@@ -1,17 +1,17 @@
-Canvas Digest Bridge privacy policy
-Effective October 6, 2026 — public release candidate 0.2.0
+Canvas Compass privacy policy
+Effective October 6, 2026 — development candidate 0.4.1
 
 Purpose and data
 This independent extension provides read-only ASU Canvas session checks, upcoming deadlines and JSON exports. Monitoring is disabled until you enable it in Settings. With monitoring enabled, it requests your profile name and user ID, active course names and IDs, assignment titles and IDs, due/availability/lock times, assignment URLs, points possible, and submission state, timestamp and excused status from canvas.asu.edu using your existing signed-in session. It does not read passwords, export session cookies, submit assignments or change Canvas content.
 
 Storage and transfers
-Snapshots, session status, timestamps, refresh errors and optional notification settings remain in chrome.storage.local in your Chrome profile. There is no developer-operated data server, analytics, advertising, sale of data or remote code. Requests to ASU Canvas are necessary to fetch your own information. The extension does not send coursework to the developer, ChatGPT, Google Calendar or a digest service.
+Snapshots, session status, timestamps, refresh errors and optional notification settings remain in chrome.storage.local in your Chrome profile. There is no developer-operated data server, analytics, advertising, sale of data or remote code. Requests to ASU Canvas are necessary to fetch your own information. The extension does not send coursework to the developer, ChatGPT or a digest service. Optional Google Calendar sync, when connected, sends selected course names, assignment titles, exact due times, source URLs, submission/completion labels and stable Canvas user/course/assignment identifiers to Google Calendar. It creates dedicated course calendars and updates its own events; it does not delete events or modify Canvas. Calendar mappings and sync status are stored locally. Chrome manages cached OAuth access tokens. Disconnect stops syncing and removes the cached token; revoke Google account access separately through Google account permissions. Existing Google calendars remain after disconnect, local clearing or uninstall.
 
 Optional Pushover alerts
 Only when you configure alerts and grant permission, the extension sends your Pushover app token and user key, a short sign-out/test message and the public Canvas homepage URL to api.pushover.net. It does not include your name, course titles, assignment details or grades in these alerts. Pushover handles delivery under its own privacy policy: https://pushover.net/privacy. Tokens and keys are stored locally without additional extension-level encryption.
 
 Exports and deletion
-Export creates a JSON file containing private course and assignment data in a location you choose. You control any subsequent sharing. Disable monitoring in Settings to stop automatic reads; Clear local data removes extension snapshots, keys and settings and disables monitoring. Uninstalling removes extension-local storage. Neither action deletes downloaded exports or data already received by Pushover.
+Export creates a JSON file containing private course and assignment data in a location you choose. You control any subsequent sharing. Disable monitoring in Settings to stop automatic reads; Clear local data removes extension snapshots, keys and settings and disables monitoring and calendar sync. Clearing mappings can result in new course calendars on a later connection. Uninstalling removes extension-local storage. Neither action deletes downloaded exports or data already received by Pushover.
 
 Limits and contact
-Browser sleep, network errors and session expiration can delay checks. Saved snapshots are not proof of current deadlines or completion. This project is not affiliated with ASU, Instructure or BetterCampus. Support and privacy questions: mohamadmkhaled26@gmail.com. Do not include notification keys or account credentials in support requests. This candidate is not yet published in Chrome Web Store.
+Browser sleep, network errors and session expiration can delay checks. Saved snapshots are not proof of current deadlines or completion. This project is not affiliated with ASU, Instructure or BetterCampus. Support and privacy questions: mohamadmkhaled26@gmail.com. Do not include notification keys or account credentials in support requests. Version 0.4.1 is a development candidate and is not yet published in Chrome Web Store.

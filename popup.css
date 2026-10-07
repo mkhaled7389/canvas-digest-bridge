@@ -2,3 +2,35 @@
 label{display:grid;gap:5px;color:var(--muted);font-size:11px;font-weight:700;margin:10px 0}input{width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:9px;background:rgba(14,36,42,.62);color:var(--ink);font:inherit}label+label{margin-top:8px}.status-card h2{margin:0;font-size:18px}.settings-copy{color:var(--muted);font-size:12px;margin:4px 0 10px}.full{width:100%;padding:8px;margin-top:8px;border-radius:10px;color:var(--ink);background:var(--panel-deep)}
 
 .filters{margin:10px 0;border:1px solid var(--line);border-radius:12px;padding:10px}summary{cursor:pointer;color:var(--mint);font-weight:700}select{padding:8px;background:var(--panel-deep);color:var(--ink);border:1px solid var(--line);border-radius:8px}fieldset{border:0;padding:0;margin:10px 0}legend{color:var(--muted);font-size:11px}.course-choice{display:flex;align-items:center;gap:8px;margin:6px 0}.course-choice input{width:auto}button:disabled{opacity:.5;cursor:wait}.assignment a{color:inherit;text-decoration:none}.assignment a:hover{text-decoration:underline}
+
+body{background:var(--pine)}.status-card{background:var(--panel)}ol{background:var(--panel-deep)}input{background:var(--panel-deep)}input[type=checkbox]{width:auto}.status-card+ .status-card{margin-top:14px}.secondary{background:var(--panel-deep)}
+
+.settings-page{width:100%;max-width:740px;margin:auto;padding:24px}.settings-page label:has(input[type=checkbox]){display:flex;align-items:center;gap:8px}.settings-page button{border-radius:8px;padding:9px;background:var(--panel-deep);color:var(--ink)}.settings-page a{color:var(--mint-deep)}
+
+/* Tactile controls and an accessible native select. */
+button{position:relative;transition:transform .12s ease,background .18s ease,box-shadow .18s ease;}
+button:hover:not(:disabled){box-shadow:0 3px 10px color-mix(in srgb,var(--mint) 16%,transparent);filter:brightness(1.08)}
+button:active:not(:disabled){transform:translateY(2px) scale(.97)}
+button:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+button.clicked{animation:click-feedback .32s ease}
+@keyframes click-feedback{0%{transform:scale(.96)}55%{box-shadow:0 0 0 5px color-mix(in srgb,var(--mint) 18%,transparent)}100%{transform:scale(1)}}
+button[aria-busy=true]{opacity:.85;cursor:progress}
+button[aria-busy=true]::after{content:"";display:inline-block;width:10px;height:10px;margin-left:7px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+select{appearance:none;width:100%;padding:10px 44px 10px 12px;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='m5 7 5 5 5-5' fill='none' stroke='%238fbd91' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;transition:border-color .18s,box-shadow .18s}
+select:hover{border-color:var(--mint-deep)}
+summary{list-style:none;display:flex;align-items:center;gap:8px}summary::-webkit-details-marker{display:none}
+summary::before{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .18s ease}
+details[open]>summary::before{transform:rotate(45deg)}
+#calendarStatus,#result{padding:9px 11px;border-radius:9px;background:var(--panel-deep);overflow-wrap:anywhere}
+#result:empty{display:none}
+#calendarStatus[data-state=error]{border-left:3px solid var(--alert)}
+#calendarStatus[data-state=success]{border-left:3px solid var(--mint-deep)}
+#calendarStatus[data-state=busy]{border-left:3px solid var(--muted)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+.brand-icon{width:40px;height:40px;border-radius:11px}.identity{margin:4px 0 12px!important;font-size:12px!important}.connection-list{display:grid;gap:9px;margin:12px 0}.connection{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px}.connection strong{font-size:10px;border-radius:99px;padding:4px 8px;background:var(--panel-deep);color:var(--muted)}.connection[data-state=good] strong{color:var(--mint-deep)}.connection[data-state=warn] strong{color:#e9c776}.connection[data-state=good] strong::before{content:"✓ ";}.status-card #detail{font-size:10px;margin:10px 0 12px}.status-card .actions button{flex:1}
+
+/* Keep busy labels and spinners centered even when narrow buttons wrap. */
+button[aria-busy=true]{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center}
+button[aria-busy=true]::after{display:block;flex:none;margin:0;align-self:center}

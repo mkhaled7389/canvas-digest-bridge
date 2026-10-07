@@ -1,3 +1,4 @@
+import {connectCalendar,disconnectCalendar,syncCalendar} from './calendar.js';
 const CHECK_ALARM = 'canvas-session-check';
 const CANVAS_URL = 'https://canvas.asu.edu/';
 
@@ -94,6 +95,9 @@ async function refreshSnapshot() {
     return { ok: false, error: `Canvas snapshot failed: ${snapshot.error}. Previous snapshot retained.` };
   }
   await chrome.storage.local.set({ canvasSnapshot: snapshot, canvasRefreshStatus: { checkedAt: new Date().toISOString(), coverage: snapshot.coverage, error: null } });
+  if ((await chrome.storage.local.get('calendarAutoSync')).calendarAutoSync) {
+    try {await syncCalendar();}catch(e){await chrome.storage.local.set({calendarSyncStatus:{ok:false,error:e.message,checkedAt:new Date().toISOString()}});}
+  }
   return { ok: true, courses: snapshot.courses.length, fetchedAt: snapshot.fetchedAt };
 }
 async function exportSnapshot() {
@@ -109,6 +113,8 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === CHECK_ALARM) void checkSession().catch(() => {});
 });
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  const actions={CONNECT_CALENDAR:connectCalendar,DISCONNECT_CALENDAR:disconnectCalendar,SYNC_CALENDAR:syncCalendar};
+  if(actions[message.type]) {void actions[message.type]().then(sendResponse).catch(async(e)=>{await chrome.storage.local.set({calendarSyncStatus:{ok:false,error:e.message,checkedAt:new Date().toISOString()}});sendResponse({ok:false,error:e.message});});return true;}
   if (message.type === 'CHECK_NOW') {
     void checkSession({ notify: false }).then((result) => sendResponse(result || { ok: true })).catch((e) => sendResponse({ ok: false, error: e.message }));
     return true;

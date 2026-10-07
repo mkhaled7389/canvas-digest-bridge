@@ -1,5 +1,13 @@
 if (!globalThis.__canvasDigestBridgeLoaded) {
 globalThis.__canvasDigestBridgeLoaded = true;
+function captureTheme() {
+  const body=getComputedStyle(document.body), root=getComputedStyle(document.documentElement);
+  const pick=(names,fallback)=>names.map(n=>root.getPropertyValue(n).trim()).find(Boolean)||fallback;
+  void chrome.storage.local.set({canvasTheme:{pine:body.backgroundColor,panel:pick(['--ic-brand-primary'],body.backgroundColor),ink:body.color,mint:pick(['--ic-brand-button--primary-bgd','--ic-brand-primary'],'#c4e7b7')}}).catch(()=>{});
+}
+captureTheme();
+let themeTimer;
+new MutationObserver(()=>{clearTimeout(themeTimer);themeTimer=setTimeout(captureTheme,500);}).observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme'],subtree:true});
 async function sessionStatus() {
   if (!(await chrome.storage.local.get('monitoringEnabled')).monitoringEnabled) return { state: 'disabled', detail: 'Enable monitoring in Settings.' };
   try {
@@ -73,7 +81,7 @@ async function canvasSnapshot() {
       error: result.error || null
     };
   }));
-  return { fetchedAt: new Date().toISOString(), coverage: results.some((r) => r.error) ? 'partial' : 'complete visible active courses', courses: results };
+  return { userId: identity.userId, fetchedAt: new Date().toISOString(), coverage: results.some((r) => r.error) ? 'partial' : 'complete visible active courses', courses: results };
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
